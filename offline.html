@@ -7,8 +7,8 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: linear-gradient(135deg, #134e4a 0%, #0d9488 50%, #fbbf24 100%);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #253320 0%, #4a6741 60%, #6e8e63 100%);
       color: #ffffff;
       min-height: 100vh;
       display: flex;
@@ -21,17 +21,30 @@
       max-width: 480px;
     }
     .offline-icon {
-      font-size: 5rem;
-      margin-bottom: 20px;
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 24px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       animation: float 3s ease-in-out infinite;
     }
+    .offline-icon svg {
+      width: 36px;
+      height: 36px;
+      stroke: #ffffff;
+    }
     h1 {
-      font-size: 1.8rem;
-      font-weight: 800;
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 2rem;
+      font-weight: 700;
       margin-bottom: 12px;
     }
     p {
-      font-size: 1.05rem;
+      font-size: 1rem;
       opacity: 0.9;
       line-height: 1.6;
       margin-bottom: 8px;
@@ -39,55 +52,84 @@
     .offline-tips {
       margin-top: 24px;
       text-align: left;
-      background: rgba(255,255,255,0.12);
-      border-radius: 12px;
-      padding: 18px 20px;
-      font-size: 0.92rem;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 18px 22px;
+      font-size: 0.9rem;
       line-height: 1.7;
+      backdrop-filter: blur(8px);
     }
     .offline-tips li {
-      margin-bottom: 4px;
+      margin-bottom: 6px;
       list-style: none;
+      position: relative;
+      padding-left: 18px;
     }
     .offline-tips li::before {
-      content: "✦ ";
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 10px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #e8efe5;
     }
     .btn-retry {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       margin-top: 28px;
-      padding: 12px 28px;
-      background: rgba(255,255,255,0.2);
-      color: white;
-      border: 1.5px solid rgba(255,255,255,0.5);
-      border-radius: 8px;
-      font-size: 1rem;
+      padding: 12px 30px;
+      background: #ffffff;
+      color: #253320;
+      border: none;
+      border-radius: 999px;
+      font-size: 0.95rem;
       font-weight: 600;
       font-family: inherit;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.2s ease;
       text-decoration: none;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
     }
     .btn-retry:hover {
-      background: rgba(255,255,255,0.3);
+      background: #f4f7f2;
+      transform: translateY(-2px);
     }
     @keyframes float {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-12px); }
+      50% { transform: translateY(-8px); }
     }
   </style>
 </head>
 <body>
   <div class="offline-container">
-    <div class="offline-icon">🧭</div>
+    <div class="offline-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="1" y1="1" x2="23" y2="23"></line>
+        <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path>
+        <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path>
+        <path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path>
+        <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path>
+        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+        <line x1="12" y1="20" x2="12.01" y2="20"></line>
+      </svg>
+    </div>
     <h1>Vous êtes hors ligne</h1>
     <p>Pas de connexion internet pour le moment.</p>
     <p>Cette page n'a pas encore été mise en cache.</p>
     <ul class="offline-tips">
-      <li>Vérifiez votre connexion WiFi ou données mobiles</li>
-      <li>Si vous avez déjà visité l'app, retournez à l'accueil</li>
-      <li>Vos étapes sauvegardées seront synchronisées au retour du réseau</li>
+      <li>Vérifiez votre connexion WiFi ou vos données mobiles</li>
+      <li>Si vous avez déjà visité l'application, retournez à l'accueil</li>
+      <li>Vos étapes sauvegardées seront automatiquement synchronisées</li>
     </ul>
-    <a href="/" class="btn-retry">🔄 Réessayer</a>
+    <a href="/" class="btn-retry">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+      </svg>
+      Réessayer
+    </a>
   </div>
 </body>
 </html>
