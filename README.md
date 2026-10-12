@@ -1,4 +1,4 @@
-# 🗺️ Journal de Voyage — Progressive Web App (PWA)
+#  Journal de Voyage — Progressive Web App (PWA)
 
 Application web progressive (PWA) de carnet de voyage installable, utilisable 100 % hors ligne avec synchronisation automatique, géolocalisation et capture photo.
 
@@ -8,7 +8,7 @@ Application web progressive (PWA) de carnet de voyage installable, utilisable 10
 
 ---
 
-## ✨ Fonctionnalités Principales
+##  Fonctionnalités Principales
 
 - **Gestion Multi-Carnets** : Créez, éditez et supprimez plusieurs carnets de voyages indépendants. Ajoutez une photo vitrine personnalisée ou profitez de l'icône de boussole par défaut.
 - **Ajout d'Étapes Détaillées** : Récits de voyage avec date, lieu, coordonnées GPS et sélection/prise de photos multiples.
@@ -33,7 +33,7 @@ Application web progressive (PWA) de carnet de voyage installable, utilisable 10
 
 ---
 
-## 🚀 Lancer le Projet en Local
+##  Lancer le Projet en Local
 
 Comme l'application utilise un **Service Worker**, elle doit être servie via un serveur HTTP local (pas via le protocole `file://`).
 
@@ -56,7 +56,7 @@ Ouvrez ensuite votre navigateur sur `http://localhost:8080`.
 
 ---
 
-## 🧪 Tester les Fonctionnalités Clés
+##  Tester les Fonctionnalités Clés
 
 1. **Test Hors Ligne** :
    - Ouvrez l'application, puis ouvrez les Outils de Développement (`F12`).
@@ -70,7 +70,7 @@ Ouvrez ensuite votre navigateur sur `http://localhost:8080`.
 
 ---
 
-## 📚 Documentation Technique
+##  Documentation Technique
 
 Pour une analyse détaillée des choix architecturaux, du cycle de vie du Service Worker, des stratégies de cache et de la conformité au barème de notation, consultez le fichier :
 👉 **[Consulter DOC-TECHNIQUE.md](./DOC-TECHNIQUE.md)**

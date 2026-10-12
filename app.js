@@ -681,23 +681,33 @@ function readFileAsOptimizedDataUrl(file, maxDimension = 1280) {
   });
 }
 
-const etapePhotosInput = document.getElementById("etape-photos");
+const etapePhotosCamera = document.getElementById("etape-photos-camera");
+const etapePhotosGallery = document.getElementById("etape-photos-gallery");
 const etapePhotosPreview = document.getElementById("etape-photos-preview");
 
-if (etapePhotosInput) {
-  etapePhotosInput.addEventListener("change", async (e) => {
-    const files = Array.from(e.target.files);
-    for (const file of files) {
-      try {
-        const dataUrl = await readFileAsOptimizedDataUrl(file);
-        currentStepPhotos.push(dataUrl);
-      } catch (err) {
-        console.warn("Échec lecture photo :", err);
-      }
+async function handleEtapePhotosSelection(files) {
+  for (const file of files) {
+    try {
+      const dataUrl = await readFileAsOptimizedDataUrl(file);
+      currentStepPhotos.push(dataUrl);
+    } catch (err) {
+      console.warn("Échec lecture photo :", err);
     }
-    renderStepPhotosPreview();
-    // Réinitialiser la valeur de l'input pour permettre de sélectionner à nouveau les mêmes fichiers
-    etapePhotosInput.value = "";
+  }
+  renderStepPhotosPreview();
+}
+
+if (etapePhotosCamera) {
+  etapePhotosCamera.addEventListener("change", (e) => {
+    handleEtapePhotosSelection(Array.from(e.target.files));
+    etapePhotosCamera.value = "";
+  });
+}
+
+if (etapePhotosGallery) {
+  etapePhotosGallery.addEventListener("change", (e) => {
+    handleEtapePhotosSelection(Array.from(e.target.files));
+    etapePhotosGallery.value = "";
   });
 }
 
@@ -924,53 +934,70 @@ document.getElementById("form-etape")?.addEventListener("submit", async (e) => {
   const id = await db.add("etapes", etape);
   etape.id = id;
 
-  // Tentative de synchronisation réseau
-  try {
-    const response = await fetch(API_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...etape,
-        // On omet les gros blobs pour l'appel de test API si nécessaire
-        photosCount: etape.photos.length,
-      }),
-    });
-
-    if (response.ok) {
-      etape.synced = true;
-      await db.put("etapes", etape);
-      showToast("Étape enregistrée et synchronisée !");
-    } else {
-      throw new Error("Réponse serveur non-OK");
-    }
-  } catch (err) {
-    console.warn("Synchronisation réseau différée :", err.message);
-    await db.add("outbox", { etapeId: id, data: etape, timestamp: Date.now() });
-
-    try {
-      const reg = await navigator.serviceWorker.ready;
-      if ("sync" in reg) {
-        await reg.sync.register("sync-etapes");
-      }
-    } catch (syncErr) {
-      console.warn("Background Sync non supporté :", syncErr);
-    }
-
-    showToast("Étape sauvegardée hors ligne — synchronisation au retour du réseau");
-  }
-
-  // Réinitialiser le formulaire et les photos
+  // 1. Mise à jour IMMÉDIATE de l'interface (Optimistic UI)
   document.getElementById("form-etape").reset();
   document.getElementById("etape-lat").value = "";
   document.getElementById("etape-lng").value = "";
-  document.getElementById("geo-status").textContent = "";
-  document.getElementById("geo-status").className = "form__help";
+  const geoStatus = document.getElementById("geo-status");
+  if (geoStatus) {
+    geoStatus.textContent = "";
+    geoStatus.className = "form__help";
+  }
 
   currentStepPhotos = [];
   renderStepPhotosPreview();
 
+  // Affichage immédiat de la nouvelle étape dans l'itinéraire
   await renderJournal();
   await renderVoyages();
+
+  // 2. Préparation du payload de synchronisation léger (SANS les lourds blobs Base64)
+  const syncPayload = {
+    id: etape.id,
+    voyageId: etape.voyageId,
+    titre: etape.titre,
+    description: etape.description,
+    lat: etape.lat,
+    lng: etape.lng,
+    date: etape.date,
+    photosCount: etape.photos.length,
+  };
+
+  // 3. Synchronisation réseau en tâche de fond
+  if (!navigator.onLine) {
+    await db.add("outbox", { etapeId: id, data: syncPayload, timestamp: Date.now() });
+    registerBackgroundSync();
+    showToast("Étape enregistrée hors ligne — synchronisation différée");
+    return;
+  }
+
+  // En ligne : envoi direct avec timeout court (3.5s)
+  try {
+    const controller = new AbortController();
+    const timeoutTimer = setTimeout(() => controller.abort(), 3500);
+
+    const response = await fetch(API_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(syncPayload),
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutTimer);
+
+    if (response.ok) {
+      etape.synced = true;
+      await db.put("etapes", etape);
+      await renderJournal(); // Passe immédiatement le badge à "Synchronisé"
+      showToast("Étape enregistrée et synchronisée !");
+    } else {
+      throw new Error(`Erreur serveur (${response.status})`);
+    }
+  } catch (err) {
+    console.warn("Synchronisation réseau différée :", err.message);
+    await db.add("outbox", { etapeId: id, data: syncPayload, timestamp: Date.now() });
+    registerBackgroundSync();
+    showToast("Étape enregistrée (en attente de synchronisation)");
+  }
 });
 
 // ============================================================
@@ -1030,6 +1057,18 @@ document.getElementById("btn-geo")?.addEventListener("click", () => {
   );
 });
 
+// Enregistrement Background Sync helper
+async function registerBackgroundSync() {
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    if ("sync" in reg) {
+      await reg.sync.register("sync-etapes");
+    }
+  } catch (syncErr) {
+    console.warn("Background Sync non supporté :", syncErr);
+  }
+}
+
 // ============================================================
 // 11. DÉTECTION RÉSEAU + SYNCHRONISATION UNIVERSELLE
 // ============================================================
@@ -1039,13 +1078,20 @@ async function syncOutbox() {
     const pending = await db.getAll("outbox");
     if (pending.length === 0) return;
 
+    let syncedAny = false;
+
     for (const item of pending) {
       try {
+        const controller = new AbortController();
+        const timeoutTimer = setTimeout(() => controller.abort(), 3500);
+
         const response = await fetch(API_ENDPOINT, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(item.data),
+          signal: controller.signal,
         });
+        clearTimeout(timeoutTimer);
 
         if (response.ok) {
           const etape = await db.get("etapes", item.etapeId);
@@ -1054,18 +1100,30 @@ async function syncOutbox() {
             await db.put("etapes", etape);
           }
           await db.delete("outbox", item.id);
+          syncedAny = true;
         }
       } catch (fetchErr) {
-        console.warn("Échec synchronisation outbox :", fetchErr);
+        console.warn("Échec synchronisation outbox item :", fetchErr);
         break;
       }
     }
 
-    await renderJournal();
-    showToast("Données synchronisées avec succès !");
+    if (syncedAny) {
+      await renderJournal();
+      showToast("Données synchronisées avec succès !");
+    }
   } catch (err) {
     console.error("Erreur syncOutbox :", err);
   }
+}
+
+// Écouter les messages du Service Worker (Background Sync terminé)
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    if (event.data && event.data.type === "SYNC_COMPLETE") {
+      renderJournal();
+    }
+  });
 }
 
 window.addEventListener("online", () => {

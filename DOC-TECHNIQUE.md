@@ -1,4 +1,4 @@
-# 📖 Document Technique — PWA Journal de Voyage
+# Document Technique — PWA Journal de Voyage
 
 **Projet :** Journal de Voyage — Application PWA complète et autonome  
 **Cadre :** TP Noté PWA · Master 2 Informatique · Università di Corsica  

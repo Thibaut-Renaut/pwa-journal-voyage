@@ -4,7 +4,7 @@
 // Background Sync pour l'outbox
 // ============================================================
 
-const CACHE_NAME = "pwa-voyage-v6";
+const CACHE_NAME = "pwa-voyage-v7";
 
 // App Shell : fichiers à pré-cacher à l'installation
 const STATIC_ASSETS = [
@@ -135,7 +135,7 @@ async function syncOutbox() {
     importScripts("https://cdn.jsdelivr.net/npm/idb@8/build/umd.js");
   }
 
-  const db = await idb.openDB("journal-voyage-db", 1);
+  const db = await idb.openDB("journal-voyage-db", 2);
   const pending = await db.getAll("outbox");
 
   for (const item of pending) {
