@@ -559,7 +559,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 18px;
+  padding: 11px 18px;
   background: var(--white);
   color: var(--green-700);
   border: 1px solid var(--green-200);
@@ -576,11 +576,38 @@ body {
   border-color: var(--green-400);
 }
 
+.photo-upload-options {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.photo-upload-item {
+  flex: 1;
+}
+
+.photo-upload-item .photo-upload-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.photo-upload-btn--camera {
+  background: var(--white);
+  border-color: var(--green-300);
+  color: var(--green-800);
+}
+
+.photo-upload-btn--gallery {
+  background: var(--white);
+  border-color: var(--green-200);
+  color: var(--green-700);
+}
+
 .photo-upload-hint {
   display: block;
   font-size: 0.74rem;
   color: var(--text-secondary);
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 .photos-preview-strip {
@@ -1437,7 +1464,7 @@ body {
    ============================================================ */
 @media (max-width: 600px) {
   .header {
-    padding: 44px 20px 36px;
+    padding: 44px 24px 36px;
   }
 
   .header__title {
@@ -1445,12 +1472,17 @@ body {
   }
 
   .main {
-    padding: 20px 14px 40px;
-    gap: 30px;
+    padding: 24px 24px 50px;
+    gap: 32px;
   }
 
   .form {
-    padding: 20px 16px;
+    padding: 22px 20px;
+  }
+
+  .photo-upload-options {
+    flex-direction: column;
+    gap: 8px;
   }
 
   .form__geo-row {
@@ -1473,5 +1505,19 @@ body {
 
   .voyage-selector-actions .btn {
     flex: 1;
+  }
+}
+
+@media (max-width: 360px) {
+  .header {
+    padding: 36px 18px 28px;
+  }
+
+  .main {
+    padding: 20px 18px 40px;
+  }
+
+  .form {
+    padding: 18px 16px;
   }
 }
