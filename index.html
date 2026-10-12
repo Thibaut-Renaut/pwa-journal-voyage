@@ -21,7 +21,7 @@
 
   <!-- Manifest PWA -->
   <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#0d9488" />
+  <meta name="theme-color" content="#4a6741" />
 
   <!-- iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -68,77 +68,89 @@
   <!-- ===== Toast de notification ===== -->
   <div id="toast" class="toast" hidden></div>
 
-  <!-- ===== En-tête ===== -->
+  <!-- ===== En-tête Hero ===== -->
   <header class="header">
     <div class="header__inner">
-      <h1 class="header__title">🧭 Journal de Voyage</h1>
-      <p class="header__subtitle">Votre carnet d'aventures — fonctionne même hors ligne</p>
-      <button id="btn-install" class="btn btn--install" hidden>📲 Installer l'app</button>
+      <h1 class="header__title">Votre Journal,<br><span>de Voyage.</span></h1>
+      <p class="header__subtitle">Enregistrez chaque étape de vos aventures, même hors ligne. Vos souvenirs, toujours avec vous.</p>
+      <button id="btn-install" class="btn btn--install" hidden>📲 Installer l'application</button>
     </div>
   </header>
 
   <!-- ===== Contenu principal ===== -->
   <main class="main">
 
-    <!-- Contenu public statique pour le SEO (visible par les robots) -->
-    <section class="section section--destinations" aria-label="Destinations inspirantes">
-      <h2 class="section__title">🌍 Destinations inspirantes</h2>
-      <p class="section__intro">Découvrez quelques idées pour vos prochaines aventures :</p>
-      <ul id="destinations-list" class="destinations-list">
-        <li data-seed class="destination-card">
-          <span class="destination-card__emoji">🏔️</span>
-          <div class="destination-card__content">
-            <strong>Les Aiguilles de Bavella, Corse</strong>
-            <p>Randonnée spectaculaire à travers les aiguilles de granite rouge. Un panorama à couper le souffle sur les montagnes corses et la mer Tyrrhénienne.</p>
-          </div>
-        </li>
-        <li data-seed class="destination-card">
-          <span class="destination-card__emoji">🌊</span>
-          <div class="destination-card__content">
-            <strong>Les Calanques de Piana, Corse</strong>
-            <p>Classées au patrimoine mondial de l'UNESCO, ces formations rocheuses de granit rose plongent dans une mer turquoise. Un spectacle naturel unique en Méditerranée.</p>
-          </div>
-        </li>
-        <li data-seed class="destination-card">
-          <span class="destination-card__emoji">🏖️</span>
-          <div class="destination-card__content">
-            <strong>La plage de Palombaggia, Porto-Vecchio</strong>
-            <p>Sable fin, eaux cristallines et pins parasols : l'une des plus belles plages de France. Idéale pour une journée de détente entre deux randonnées.</p>
-          </div>
-        </li>
-      </ul>
-    </section>
-
     <!-- Formulaire d'ajout d'une étape -->
     <section class="section section--form" aria-label="Ajouter une étape">
-      <h2 class="section__title">✏️ Ajouter une étape à mon journal</h2>
+      <h2 class="section__title">
+        <span class="section__title-icon section__title-icon--form">✏️</span>
+        Nouvelle étape
+      </h2>
       <form id="form-etape" class="form" autocomplete="off">
         <div class="form__group">
-          <label for="etape-titre" class="form__label">Titre de l'étape</label>
+          <label for="etape-titre" class="form__label">Titre</label>
           <input type="text" id="etape-titre" class="form__input" placeholder="Ex : Arrivée à Ajaccio" required />
         </div>
         <div class="form__group">
           <label for="etape-description" class="form__label">Description</label>
           <textarea id="etape-description" class="form__textarea" rows="3" placeholder="Racontez votre expérience…" required></textarea>
         </div>
+        <hr class="form__divider" />
         <div class="form__group form__group--geo">
           <label class="form__label">Position GPS</label>
           <div class="form__geo-row">
             <input type="text" id="etape-lat" class="form__input form__input--small" placeholder="Latitude" readonly />
             <input type="text" id="etape-lng" class="form__input form__input--small" placeholder="Longitude" readonly />
-            <button type="button" id="btn-geo" class="btn btn--geo">📍 Ajouter ma position</button>
+            <button type="button" id="btn-geo" class="btn btn--geo">📍 Ma position</button>
           </div>
           <p id="geo-status" class="form__help"></p>
         </div>
-        <button type="submit" class="btn btn--primary">💾 Enregistrer l'étape</button>
+        <button type="submit" class="btn btn--primary">Enregistrer l'étape →</button>
       </form>
     </section>
 
-    <!-- Liste des étapes du journal -->
+    <!-- Liste des étapes du journal (Timeline) -->
     <section class="section section--journal" aria-label="Mon journal">
-      <h2 class="section__title">📖 Mon journal</h2>
-      <p id="journal-empty" class="section__empty">Aucune étape pour l'instant. Ajoutez votre première aventure !</p>
+      <h2 class="section__title">
+        <span class="section__title-icon section__title-icon--journal">📖</span>
+        Mon itinéraire
+      </h2>
+      <p id="journal-empty" class="section__empty">Aucune étape pour l'instant.<br>Ajoutez votre première aventure !</p>
       <ul id="journal-list" class="journal-list"></ul>
+    </section>
+
+    <!-- Contenu public statique pour le SEO (destinations en dernier) -->
+    <section class="section section--destinations" aria-label="Destinations inspirantes">
+      <h2 class="section__title">
+        <span class="section__title-icon section__title-icon--green">🌍</span>
+        Destinations inspirantes
+      </h2>
+      <ul id="destinations-list" class="destinations-list">
+        <li data-seed class="destination-card">
+          <div class="destination-card__image destination-card__image--bavella">🏔️</div>
+          <div class="destination-card__body">
+            <p class="destination-card__name">Aiguilles de Bavella</p>
+            <p class="destination-card__location">📍 Corse, France</p>
+          </div>
+          <p class="destination-card__description">Randonnée spectaculaire à travers les aiguilles de granite rouge. Un panorama à couper le souffle sur les montagnes corses et la mer Tyrrhénienne.</p>
+        </li>
+        <li data-seed class="destination-card">
+          <div class="destination-card__image destination-card__image--piana">🌊</div>
+          <div class="destination-card__body">
+            <p class="destination-card__name">Calanques de Piana</p>
+            <p class="destination-card__location">📍 Corse, France</p>
+          </div>
+          <p class="destination-card__description">Classées au patrimoine mondial de l'UNESCO, ces formations rocheuses de granit rose plongent dans une mer turquoise. Un spectacle naturel unique en Méditerranée.</p>
+        </li>
+        <li data-seed class="destination-card">
+          <div class="destination-card__image destination-card__image--palombaggia">🏖️</div>
+          <div class="destination-card__body">
+            <p class="destination-card__name">Palombaggia</p>
+            <p class="destination-card__location">📍 Porto-Vecchio, Corse</p>
+          </div>
+          <p class="destination-card__description">Sable fin, eaux cristallines et pins parasols : l'une des plus belles plages de France. Idéale pour une journée de détente entre deux randonnées.</p>
+        </li>
+      </ul>
     </section>
 
   </main>

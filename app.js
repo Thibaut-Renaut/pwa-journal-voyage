@@ -96,11 +96,11 @@ window.addEventListener("appinstalled", () => {
 async function hydrateDestinations() {
   const list = document.getElementById("destinations-list");
   const seeds = [...list.querySelectorAll("[data-seed]")].map((li) => {
-    const strong = li.querySelector("strong");
-    const p = li.querySelector("p");
+    const name = li.querySelector(".destination-card__name");
+    const desc = li.querySelector(".destination-card__description");
     return {
-      nom: strong ? strong.textContent.trim() : "",
-      description: p ? p.textContent.trim() : "",
+      nom: name ? name.textContent.trim() : "",
+      description: desc ? desc.textContent.trim() : "",
     };
   });
 
@@ -125,7 +125,7 @@ async function hydrateDestinations() {
 }
 
 // ============================================================
-// 4. AFFICHAGE DU JOURNAL DEPUIS IndexedDB
+// 4. AFFICHAGE DU JOURNAL DEPUIS IndexedDB (Style Timeline)
 // ============================================================
 async function renderJournal() {
   const db = await dbPromise;
@@ -144,30 +144,20 @@ async function renderJournal() {
   // Trier par date décroissante
   etapes.sort((a, b) => b.date - a.date);
 
-  const items = etapes.map((etape) => {
+  const items = etapes.map((etape, index) => {
     const li = document.createElement("li");
     li.className = "journal-entry";
 
-    const dateStr = new Date(etape.date).toLocaleDateString("fr-FR", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    // --- Pastille numérotée (timeline) ---
+    const dot = document.createElement("div");
+    dot.className = "journal-entry__dot";
+    dot.textContent = index + 1;
 
-    let geoHtml = "";
-    if (etape.lat && etape.lng) {
-      geoHtml = `<span class="journal-entry__geo">📍 ${etape.lat.toFixed(4)}, ${etape.lng.toFixed(4)}</span>`;
-    }
+    // --- Carte de contenu ---
+    const card = document.createElement("div");
+    card.className = "journal-entry__card";
 
-    let pendingHtml = "";
-    if (etape.synced === false) {
-      pendingHtml = `<span class="journal-entry__pending">⏳ En attente de sync</span>`;
-    }
-
-    // On utilise textContent pour les données utilisateur (sécurité XSS)
-    // Mais ici on construit le squelette HTML, puis on injecte les textes en textContent
+    // En-tête : titre + date
     const header = document.createElement("div");
     header.className = "journal-entry__header";
 
@@ -175,25 +165,45 @@ async function renderJournal() {
     title.className = "journal-entry__title";
     title.textContent = etape.titre;
 
+    const dateStr = new Date(etape.date).toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
     const date = document.createElement("span");
     date.className = "journal-entry__date";
     date.textContent = dateStr;
 
     header.appendChild(title);
     header.appendChild(date);
+    card.appendChild(header);
 
+    // Description
     const desc = document.createElement("p");
     desc.className = "journal-entry__description";
     desc.textContent = etape.description;
+    card.appendChild(desc);
 
-    li.appendChild(header);
-    li.appendChild(desc);
+    // Badges (geo + pending)
+    const badges = document.createElement("div");
+    badges.className = "journal-entry__badges";
 
-    // Geo et pending badges (safe HTML)
-    if (geoHtml || pendingHtml) {
-      const badges = document.createElement("div");
-      badges.innerHTML = geoHtml + pendingHtml;
-      li.appendChild(badges);
+    if (etape.lat && etape.lng) {
+      const geo = document.createElement("span");
+      geo.className = "journal-entry__geo";
+      geo.textContent = `📍 ${etape.lat.toFixed(4)}, ${etape.lng.toFixed(4)}`;
+      badges.appendChild(geo);
+    }
+
+    if (etape.synced === false) {
+      const pending = document.createElement("span");
+      pending.className = "journal-entry__pending";
+      pending.textContent = "⏳ En attente de sync";
+      badges.appendChild(pending);
+    }
+
+    if (badges.children.length > 0) {
+      card.appendChild(badges);
     }
 
     // Bouton supprimer
@@ -201,10 +211,14 @@ async function renderJournal() {
     actions.className = "journal-entry__actions";
     const btnDelete = document.createElement("button");
     btnDelete.className = "btn btn--delete";
-    btnDelete.textContent = "🗑️ Supprimer";
+    btnDelete.textContent = "Supprimer";
     btnDelete.addEventListener("click", () => deleteEtape(etape.id));
     actions.appendChild(btnDelete);
-    li.appendChild(actions);
+    card.appendChild(actions);
+
+    // Assemblage timeline
+    li.appendChild(dot);
+    li.appendChild(card);
 
     return li;
   });
@@ -272,7 +286,7 @@ document.getElementById("form-etape").addEventListener("submit", async (e) => {
       console.warn("Background Sync non disponible :", syncErr);
     }
 
-    showToast("📴 Étape sauvegardée hors ligne — elle sera synchronisée au retour du réseau");
+    showToast("📴 Étape sauvegardée hors ligne — synchronisation au retour du réseau");
   }
 
   // Réinitialiser le formulaire
