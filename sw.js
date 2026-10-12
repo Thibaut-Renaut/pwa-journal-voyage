@@ -4,7 +4,7 @@
 // Background Sync pour l'outbox
 // ============================================================
 
-const CACHE_NAME = "pwa-voyage-v4";
+const CACHE_NAME = "pwa-voyage-v5";
 
 // App Shell : fichiers à pré-cacher à l'installation
 const STATIC_ASSETS = [

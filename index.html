@@ -51,7 +51,7 @@
   </script>
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/style.css?v=4">
+  <link rel="stylesheet" href="/style.css?v=5">
 
   <!-- idb via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/idb@8/build/umd.js"></script>
@@ -112,6 +112,13 @@
           </h2>
         </div>
         <div class="voyage-selector-actions">
+          <button type="button" id="btn-edit-active-voyage" class="btn btn--secondary btn--sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            Modifier le carnet
+          </button>
           <button type="button" id="btn-change-voyage" class="btn btn--secondary btn--sm">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="17 1 21 5 17 9"></polyline>
@@ -319,6 +326,50 @@
     </div>
   </div>
 
+  <!-- ===== Modale : Modifier le carnet de voyage ouvert ===== -->
+  <div id="modal-edit-voyage" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="modal-edit-voyage-title">
+    <div class="modal-overlay__backdrop" id="modal-edit-voyage-backdrop"></div>
+    <div class="modal-card">
+      <button type="button" id="btn-close-edit-voyage" class="modal-card__close" aria-label="Fermer">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+      <div class="modal-card__header">
+        <span class="modal-card__badge">Édition</span>
+        <h3 id="modal-edit-voyage-title" class="modal-card__title">Modifier le carnet</h3>
+        <p class="modal-card__subtitle">Mettez à jour le titre, la description ou la photo vitrine de ce carnet.</p>
+      </div>
+      <form id="form-edit-voyage" class="modal-form" autocomplete="off">
+        <div class="form__group">
+          <label for="edit-voyage-titre" class="form__label">Titre du voyage</label>
+          <input type="text" id="edit-voyage-titre" class="form__input" placeholder="Ex : Échappée en Corse" required />
+        </div>
+        <div class="form__group">
+          <label for="edit-voyage-desc" class="form__label">Description du voyage</label>
+          <textarea id="edit-voyage-desc" class="form__textarea" rows="2" placeholder="Description de cette aventure…" required></textarea>
+        </div>
+        <div class="form__group">
+          <label class="form__label">Photo vitrine (couverture)</label>
+          <div class="photo-upload-zone">
+            <input type="file" id="edit-voyage-photo" accept="image/*" class="file-input-hidden" />
+            <label for="edit-voyage-photo" class="photo-upload-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+              <span>Changer la photo de couverture</span>
+            </label>
+            <span class="photo-upload-hint">Optionnelle — sera remplacée par une icône de voyage si absente</span>
+          </div>
+          <div id="edit-voyage-photo-preview" class="voyage-photo-preview" hidden></div>
+          <div id="edit-voyage-photo-actions" class="edit-photo-actions" hidden>
+            <button type="button" id="btn-remove-edit-cover" class="btn btn--delete btn--sm">Supprimer la photo de couverture</button>
+          </div>
+        </div>
+        <div class="modal-card__actions">
+          <button type="button" id="btn-cancel-edit-voyage" class="btn btn--outline">Annuler</button>
+          <button type="submit" class="btn btn--primary">Enregistrer les modifications →</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- ===== Modale : Changer de carnet de voyage ===== -->
   <div id="modal-switch-voyage" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="modal-switch-title">
     <div class="modal-overlay__backdrop" id="modal-switch-voyage-backdrop"></div>
@@ -382,6 +433,6 @@
   </footer>
 
   <!-- Application logic -->
-  <script src="/app.js?v=4"></script>
+  <script src="/app.js?v=5"></script>
 </body>
 </html>

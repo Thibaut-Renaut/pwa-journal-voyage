@@ -233,12 +233,26 @@ async function renderVoyages() {
       media.appendChild(activeBadge);
     }
 
-    const img = document.createElement("img");
-    img.src = voyage.photoVitrine || "/images/piana.jpg";
-    img.alt = `Photo de couverture pour ${voyage.titre}`;
-    img.className = "destination-card__img";
-    img.loading = "lazy";
-    media.appendChild(img);
+    if (voyage.photoVitrine) {
+      const img = document.createElement("img");
+      img.src = voyage.photoVitrine;
+      img.alt = `Photo de couverture pour ${voyage.titre}`;
+      img.className = "destination-card__img";
+      img.loading = "lazy";
+      media.appendChild(img);
+    } else {
+      media.className = "destination-card__media destination-card__media--placeholder";
+      const placeholder = document.createElement("div");
+      placeholder.className = "destination-card__placeholder-icon";
+      placeholder.innerHTML = `
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+        </svg>
+        <span>Carnet de voyage</span>
+      `;
+      media.appendChild(placeholder);
+    }
     li.appendChild(media);
 
     const body = document.createElement("div");
@@ -264,23 +278,35 @@ async function renderVoyages() {
     const footer = document.createElement("div");
     footer.className = "voyage-card__footer";
 
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = `btn ${isActive ? "btn--secondary" : "btn--primary"} btn--sm`;
-    btn.textContent = isActive ? "Carnet ouvert" : "Ouvrir ce carnet";
-    btn.disabled = isActive;
-    btn.addEventListener("click", () => setActiveVoyage(voyage.id));
-    footer.appendChild(btn);
+    const actions = document.createElement("div");
+    actions.className = "voyage-card__actions";
 
+    const btnOpen = document.createElement("button");
+    btnOpen.type = "button";
+    btnOpen.className = `btn ${isActive ? "btn--secondary" : "btn--primary"} btn--sm`;
+    btnOpen.textContent = isActive ? "Carnet ouvert" : "Ouvrir ce carnet";
+    btnOpen.disabled = isActive;
+    btnOpen.addEventListener("click", () => setActiveVoyage(voyage.id));
+    actions.appendChild(btnOpen);
+
+    const btnEdit = document.createElement("button");
+    btnEdit.type = "button";
+    btnEdit.className = "btn btn--outline btn--sm";
+    btnEdit.textContent = "Modifier";
+    btnEdit.addEventListener("click", () => openEditVoyageModal(voyage.id));
+    actions.appendChild(btnEdit);
+
+    footer.appendChild(actions);
     li.appendChild(footer);
     list.appendChild(li);
   });
 }
 
 // ============================================================
-// 4. MODALES : CRÉATION & SÉLECTION DE VOYAGE
+// 4. MODALES : CRÉATION, ÉDITION & SÉLECTION DE VOYAGE
 // ============================================================
 const modalCreateVoyage = document.getElementById("modal-create-voyage");
+const modalEditVoyage = document.getElementById("modal-edit-voyage");
 const modalSwitchVoyage = document.getElementById("modal-switch-voyage");
 
 function showModal(modal) {
@@ -307,6 +333,14 @@ document.getElementById("btn-switch-create-new")?.addEventListener("click", () =
 document.getElementById("btn-close-create-voyage")?.addEventListener("click", () => hideModal(modalCreateVoyage));
 document.getElementById("btn-cancel-create-voyage")?.addEventListener("click", () => hideModal(modalCreateVoyage));
 document.getElementById("modal-create-voyage-backdrop")?.addEventListener("click", () => hideModal(modalCreateVoyage));
+
+// Bouton de modification du carnet ouvert
+document.getElementById("btn-edit-active-voyage")?.addEventListener("click", () => openEditVoyageModal(currentVoyageId));
+
+// Fermeture d'édition
+document.getElementById("btn-close-edit-voyage")?.addEventListener("click", () => hideModal(modalEditVoyage));
+document.getElementById("btn-cancel-edit-voyage")?.addEventListener("click", () => hideModal(modalEditVoyage));
+document.getElementById("modal-edit-voyage-backdrop")?.addEventListener("click", () => hideModal(modalEditVoyage));
 
 // Bouton de changement de voyage
 document.getElementById("btn-change-voyage")?.addEventListener("click", async () => {
@@ -335,11 +369,23 @@ async function renderSwitchVoyageList() {
     const item = document.createElement("div");
     item.className = `switch-voyage-item ${isCurrent ? "is-selected" : ""}`;
 
-    const img = document.createElement("img");
-    img.src = v.photoVitrine || "/images/piana.jpg";
-    img.alt = v.titre;
-    img.className = "switch-voyage-item__img";
-    item.appendChild(img);
+    if (v.photoVitrine) {
+      const img = document.createElement("img");
+      img.src = v.photoVitrine;
+      img.alt = v.titre;
+      img.className = "switch-voyage-item__img";
+      item.appendChild(img);
+    } else {
+      const placeholder = document.createElement("div");
+      placeholder.className = "switch-voyage-item__img switch-voyage-item__placeholder";
+      placeholder.innerHTML = `
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+        </svg>
+      `;
+      item.appendChild(placeholder);
+    }
 
     const info = document.createElement("div");
     info.className = "switch-voyage-item__info";
@@ -382,7 +428,7 @@ if (voyagePhotoInput) {
   });
 }
 
-// Soumission du formulaire de création de voyage
+// Soumission du formulaire de création de voyage (SANS image par défaut forcée)
 document.getElementById("form-create-voyage")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const titre = document.getElementById("voyage-input-titre").value.trim();
@@ -393,7 +439,7 @@ document.getElementById("form-create-voyage")?.addEventListener("submit", async 
   const newVoyage = {
     titre,
     description: description || "Carnet d'aventures",
-    photoVitrine: newVoyageCoverDataUrl || "/images/piana.jpg",
+    photoVitrine: newVoyageCoverDataUrl || null,
     dateCreation: Date.now(),
   };
 
@@ -411,6 +457,93 @@ document.getElementById("form-create-voyage")?.addEventListener("submit", async 
   hideModal(modalCreateVoyage);
   await setActiveVoyage(id);
   showToast(`Nouveau carnet « ${titre} » créé !`);
+});
+
+// Logique d'édition d'un carnet
+let editingVoyageId = null;
+let editVoyageCoverDataUrl = null;
+const editVoyagePhotoInput = document.getElementById("edit-voyage-photo");
+const editVoyagePhotoPreview = document.getElementById("edit-voyage-photo-preview");
+const editVoyagePhotoActions = document.getElementById("edit-voyage-photo-actions");
+const btnRemoveEditCover = document.getElementById("btn-remove-edit-cover");
+
+async function openEditVoyageModal(voyageId) {
+  const db = await dbPromise;
+  const voyage = await db.get("voyages", voyageId || currentVoyageId);
+  if (!voyage) return;
+
+  editingVoyageId = voyage.id;
+  document.getElementById("edit-voyage-titre").value = voyage.titre;
+  document.getElementById("edit-voyage-desc").value = voyage.description;
+  editVoyageCoverDataUrl = voyage.photoVitrine || null;
+
+  if (editVoyageCoverDataUrl && editVoyagePhotoPreview) {
+    editVoyagePhotoPreview.hidden = false;
+    editVoyagePhotoPreview.innerHTML = `<img src="${editVoyageCoverDataUrl}" alt="Photo de couverture">`;
+    if (editVoyagePhotoActions) editVoyagePhotoActions.hidden = false;
+  } else {
+    if (editVoyagePhotoPreview) {
+      editVoyagePhotoPreview.hidden = true;
+      editVoyagePhotoPreview.innerHTML = "";
+    }
+    if (editVoyagePhotoActions) editVoyagePhotoActions.hidden = true;
+  }
+
+  showModal(modalEditVoyage);
+}
+
+if (editVoyagePhotoInput) {
+  editVoyagePhotoInput.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    editVoyageCoverDataUrl = await readFileAsOptimizedDataUrl(file, 1200);
+    if (editVoyagePhotoPreview) {
+      editVoyagePhotoPreview.hidden = false;
+      editVoyagePhotoPreview.innerHTML = `<img src="${editVoyageCoverDataUrl}" alt="Aperçu photo vitrine">`;
+    }
+    if (editVoyagePhotoActions) editVoyagePhotoActions.hidden = false;
+  });
+}
+
+if (btnRemoveEditCover) {
+  btnRemoveEditCover.addEventListener("click", () => {
+    editVoyageCoverDataUrl = null;
+    if (editVoyagePhotoPreview) {
+      editVoyagePhotoPreview.hidden = true;
+      editVoyagePhotoPreview.innerHTML = "";
+    }
+    if (editVoyagePhotoActions) editVoyagePhotoActions.hidden = true;
+    if (editVoyagePhotoInput) editVoyagePhotoInput.value = "";
+  });
+}
+
+document.getElementById("form-edit-voyage")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!editingVoyageId) return;
+
+  const titre = document.getElementById("edit-voyage-titre").value.trim();
+  const description = document.getElementById("edit-voyage-desc").value.trim();
+  if (!titre) return;
+
+  const db = await dbPromise;
+  const voyage = await db.get("voyages", editingVoyageId);
+  if (!voyage) return;
+
+  voyage.titre = titre;
+  voyage.description = description;
+  voyage.photoVitrine = editVoyageCoverDataUrl;
+
+  await db.put("voyages", voyage);
+
+  hideModal(modalEditVoyage);
+
+  if (editingVoyageId === currentVoyageId) {
+    await updateActiveVoyageUI();
+    await renderJournal();
+  }
+  await renderVoyages();
+
+  showToast(`Carnet « ${titre} » mis à jour !`);
 });
 
 // ============================================================
