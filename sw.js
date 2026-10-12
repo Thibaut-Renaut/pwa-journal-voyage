@@ -4,7 +4,7 @@
 // Background Sync pour l'outbox
 // ============================================================
 
-const CACHE_NAME = "pwa-voyage-v2";
+const CACHE_NAME = "pwa-voyage-v4";
 
 // App Shell : fichiers à pré-cacher à l'installation
 const STATIC_ASSETS = [
@@ -14,6 +14,9 @@ const STATIC_ASSETS = [
   "/style.css",
   "/offline.html",
   "/manifest.json",
+  "/images/bavella.jpg",
+  "/images/piana.jpg",
+  "/images/palombaggia.jpg",
 ];
 
 // ============================================================
@@ -92,7 +95,7 @@ self.addEventListener("fetch", (event) => {
   // --- Assets statiques : Cache First ---
   if (url.pathname.match(/\.(css|js|png|jpg|jpeg|svg|ico|woff2|webp)$/)) {
     event.respondWith(
-      caches.match(event.request, { ignoreSearch: true }).then((cached) => {
+      caches.match(event.request).then((cached) => {
         if (cached) return cached;
         // Pas en cache → tenter le réseau et mettre en cache
         return fetch(event.request).then((response) => {

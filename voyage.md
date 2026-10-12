@@ -11,8 +11,8 @@
 
 ## Fonctionnalités
 
-- Ajoutez des étapes à votre journal de voyage
-- Associez des coordonnées GPS à chaque étape
-- Fonctionne hors ligne grâce au Service Worker et IndexedDB
-- Synchronisation automatique au retour du réseau
-- Installable sur l'écran d'accueil (PWA)
+- Gestion multi-carnets : créez plusieurs voyages indépendants avec photo de couverture
+- Ajoutez des étapes à vos carnets avec récit, photos multiples et coordonnées GPS
+- Fonctionne entièrement hors ligne grâce au Service Worker et IndexedDB
+- Synchronisation automatique avec le serveur au retour du réseau
+- Installable sur l'écran d'accueil (PWA) avec pop-up d'installation dédiée
