@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Journal de Voyage — Carnet d'aventures hors ligne</title>
+  <meta name="description" content="Journal de voyage installable et utilisable hors ligne. Enregistrez vos étapes, vos positions GPS et synchronisez au retour du réseau. Projet M2 Informatique, Università di Corsica." />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://journal-voyage.netlify.app/" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Journal de Voyage — Carnet d'aventures hors ligne" />
+  <meta property="og:description" content="Journal de voyage installable et utilisable hors ligne. Enregistrez vos étapes avec coordonnées GPS." />
+  <meta property="og:image" content="https://journal-voyage.netlify.app/icon-512.png" />
+  <meta property="og:url" content="https://journal-voyage.netlify.app/" />
+  <meta property="og:type" content="website" />
+
+  <!-- Jumelle Markdown pour les agents IA -->
+  <link rel="alternate" type="text/markdown" href="/voyage.md" />
+
+  <!-- Manifest PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0d9488" />
+
+  <!-- iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="apple-touch-icon" href="/icon-192.png" />
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Journal de Voyage",
+    "applicationCategory": "TravelApplication",
+    "operatingSystem": "Any",
+    "url": "https://journal-voyage.netlify.app/",
+    "description": "Journal de voyage installable et utilisable hors ligne. Enregistrez vos étapes avec coordonnées GPS.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "EUR"
+    }
+  }
+  </script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/style.css">
+
+  <!-- idb via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/idb@8/build/umd.js"></script>
+</head>
+<body>
+
+  <!-- ===== Bannière de mise à jour ===== -->
+  <div id="update-banner" class="update-banner" hidden>
+    <p>🔄 Une nouvelle version est disponible !</p>
+    <button id="btn-update" class="btn btn--accent">Mettre à jour</button>
+    <button id="btn-dismiss-update" class="btn btn--ghost" aria-label="Fermer">✕</button>
+  </div>
+
+  <!-- ===== Indicateur réseau ===== -->
+  <div id="network-status" class="network-status" hidden>
+    <span id="network-status-text"></span>
+  </div>
+
+  <!-- ===== Toast de notification ===== -->
+  <div id="toast" class="toast" hidden></div>
+
+  <!-- ===== En-tête ===== -->
+  <header class="header">
+    <div class="header__inner">
+      <h1 class="header__title">🧭 Journal de Voyage</h1>
+      <p class="header__subtitle">Votre carnet d'aventures — fonctionne même hors ligne</p>
+      <button id="btn-install" class="btn btn--install" hidden>📲 Installer l'app</button>
+    </div>
+  </header>
+
+  <!-- ===== Contenu principal ===== -->
+  <main class="main">
+
+    <!-- Contenu public statique pour le SEO (visible par les robots) -->
+    <section class="section section--destinations" aria-label="Destinations inspirantes">
+      <h2 class="section__title">🌍 Destinations inspirantes</h2>
+      <p class="section__intro">Découvrez quelques idées pour vos prochaines aventures :</p>
+      <ul id="destinations-list" class="destinations-list">
+        <li data-seed class="destination-card">
+          <span class="destination-card__emoji">🏔️</span>
+          <div class="destination-card__content">
+            <strong>Les Aiguilles de Bavella, Corse</strong>
+            <p>Randonnée spectaculaire à travers les aiguilles de granite rouge. Un panorama à couper le souffle sur les montagnes corses et la mer Tyrrhénienne.</p>
+          </div>
+        </li>
+        <li data-seed class="destination-card">
+          <span class="destination-card__emoji">🌊</span>
+          <div class="destination-card__content">
+            <strong>Les Calanques de Piana, Corse</strong>
+            <p>Classées au patrimoine mondial de l'UNESCO, ces formations rocheuses de granit rose plongent dans une mer turquoise. Un spectacle naturel unique en Méditerranée.</p>
+          </div>
+        </li>
+        <li data-seed class="destination-card">
+          <span class="destination-card__emoji">🏖️</span>
+          <div class="destination-card__content">
+            <strong>La plage de Palombaggia, Porto-Vecchio</strong>
+            <p>Sable fin, eaux cristallines et pins parasols : l'une des plus belles plages de France. Idéale pour une journée de détente entre deux randonnées.</p>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Formulaire d'ajout d'une étape -->
+    <section class="section section--form" aria-label="Ajouter une étape">
+      <h2 class="section__title">✏️ Ajouter une étape à mon journal</h2>
+      <form id="form-etape" class="form" autocomplete="off">
+        <div class="form__group">
+          <label for="etape-titre" class="form__label">Titre de l'étape</label>
+          <input type="text" id="etape-titre" class="form__input" placeholder="Ex : Arrivée à Ajaccio" required />
+        </div>
+        <div class="form__group">
+          <label for="etape-description" class="form__label">Description</label>
+          <textarea id="etape-description" class="form__textarea" rows="3" placeholder="Racontez votre expérience…" required></textarea>
+        </div>
+        <div class="form__group form__group--geo">
+          <label class="form__label">Position GPS</label>
+          <div class="form__geo-row">
+            <input type="text" id="etape-lat" class="form__input form__input--small" placeholder="Latitude" readonly />
+            <input type="text" id="etape-lng" class="form__input form__input--small" placeholder="Longitude" readonly />
+            <button type="button" id="btn-geo" class="btn btn--geo">📍 Ajouter ma position</button>
+          </div>
+          <p id="geo-status" class="form__help"></p>
+        </div>
+        <button type="submit" class="btn btn--primary">💾 Enregistrer l'étape</button>
+      </form>
+    </section>
+
+    <!-- Liste des étapes du journal -->
+    <section class="section section--journal" aria-label="Mon journal">
+      <h2 class="section__title">📖 Mon journal</h2>
+      <p id="journal-empty" class="section__empty">Aucune étape pour l'instant. Ajoutez votre première aventure !</p>
+      <ul id="journal-list" class="journal-list"></ul>
+    </section>
+
+  </main>
+
+  <!-- ===== Pied de page ===== -->
+  <footer class="footer">
+    <p>Journal de Voyage — Projet PWA · M2 Informatique · Università di Corsica · 2026</p>
+  </footer>
+
+  <!-- Application logic -->
+  <script src="/app.js"></script>
+</body>
+</html>
