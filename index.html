@@ -46,7 +46,7 @@
   </script>
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/style.css?v=2">
 
   <!-- idb via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/idb@8/build/umd.js"></script>
@@ -73,7 +73,6 @@
     <div class="header__inner">
       <h1 class="header__title">Votre Journal,<br><span>de Voyage.</span></h1>
       <p class="header__subtitle">Enregistrez chaque étape de vos aventures, même hors ligne. Vos souvenirs, toujours avec vous.</p>
-      <button id="btn-install" class="btn btn--install" hidden>📲 Installer l'application</button>
     </div>
   </header>
 
@@ -155,12 +154,36 @@
 
   </main>
 
+  <!-- ===== Popup / Modale d'installation PWA ===== -->
+  <div id="install-modal" class="install-modal" hidden role="dialog" aria-modal="true" aria-labelledby="install-modal-title">
+    <div class="install-modal__backdrop" id="install-modal-backdrop"></div>
+    <div class="install-modal__card">
+      <button id="btn-install-close" class="install-modal__close" aria-label="Fermer la boîte de dialogue">✕</button>
+      <div class="install-modal__badge">
+        <span class="install-modal__badge-icon">🌿</span>
+        <span>Application PWA</span>
+      </div>
+      <div class="install-modal__header">
+        <div class="install-modal__icon">🧭</div>
+        <div>
+          <h3 id="install-modal-title" class="install-modal__title">Installer l'application</h3>
+          <p class="install-modal__subtitle">Journal de Voyage</p>
+        </div>
+      </div>
+      <p class="install-modal__desc">Emportez votre carnet d'aventures partout avec vous, même sans connexion Internet. Ajoutez-le à votre écran d'accueil pour une expérience rapide et fluide.</p>
+      <div class="install-modal__actions">
+        <button id="btn-install-dismiss" class="btn btn--outline">Plus tard</button>
+        <button id="btn-install-confirm" class="btn btn--primary">Installer l'application →</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== Pied de page ===== -->
   <footer class="footer">
     <p>Journal de Voyage — Projet PWA · M2 Informatique · Università di Corsica · 2026</p>
   </footer>
 
   <!-- Application logic -->
-  <script src="/app.js"></script>
+  <script src="/app.js?v=2"></script>
 </body>
 </html>
