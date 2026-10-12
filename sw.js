@@ -14,6 +14,7 @@ const STATIC_ASSETS = [
   "/style.css",
   "/offline.html",
   "/manifest.json",
+  "/voyage.md",
   "/images/bavella.jpg",
   "/images/piana.jpg",
   "/images/palombaggia.jpg",
@@ -70,7 +71,7 @@ self.addEventListener("fetch", (event) => {
   if (event.request.mode === "navigate") {
     event.respondWith(
       caches.open(CACHE_NAME).then(async (cache) => {
-        const cached = await cache.match(event.request);
+        const cached = await cache.match(event.request, { ignoreSearch: true });
         const fetchPromise = fetch(event.request)
           .then((response) => {
             // Mettre à jour le cache en arrière-plan
