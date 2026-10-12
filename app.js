@@ -234,6 +234,11 @@ async function renderVoyages() {
   const list = document.getElementById("voyages-list");
   if (!list) return;
 
+  if (voyages.length === 0) {
+    const hasSeed = list.querySelectorAll("[data-seed-voyage]").length > 0;
+    if (hasSeed) return;
+  }
+
   // Récupérer toutes les étapes pour calculer le nombre par voyage
   const allEtapes = await db.getAll("etapes");
 
@@ -772,25 +777,31 @@ function renderStepPhotosPreview() {
 // 6. HYDRATATION DES DESTINATIONS PUBLIQUES (SEO → IndexedDB)
 // ============================================================
 async function hydrateDestinations() {
-  const list = document.getElementById("destinations-list");
-  if (!list) return;
-
-  const seeds = [...list.querySelectorAll("[data-seed]")].map((li) => {
-    const name = li.querySelector(".destination-card__name");
-    const desc = li.querySelector(".destination-card__description");
-    const img = li.querySelector(".destination-card__img");
-    return {
-      nom: name ? name.textContent.trim() : "",
-      description: desc ? desc.textContent.trim() : "",
-      imgSrc: img ? img.getAttribute("src") : null,
-    };
-  });
-
   const db = await dbPromise;
   if (!db) return;
 
   // Premier lancement uniquement : importer les exemples dans le voyage actif
   if ((await db.count("etapes")) === 0) {
+    const seedNodes = document.querySelectorAll("#journal-list [data-seed]");
+    const seeds = [];
+    if (seedNodes.length > 0) {
+      seedNodes.forEach((li) => {
+        const title = li.querySelector(".journal-entry__title")?.textContent.trim();
+        const desc = li.querySelector(".journal-entry__desc")?.textContent.trim();
+        if (title) seeds.push({ nom: title, description: desc || "", imgSrc: null });
+      });
+    } else {
+      const destList = document.getElementById("destinations-list");
+      if (destList) {
+        destList.querySelectorAll("[data-seed]").forEach((li) => {
+          const name = li.querySelector(".destination-card__name")?.textContent.trim();
+          const desc = li.querySelector(".destination-card__description")?.textContent.trim();
+          const img = li.querySelector(".destination-card__img")?.getAttribute("src");
+          if (name) seeds.push({ nom: name, description: desc || "", imgSrc: img });
+        });
+      }
+    }
+
     for (const seed of seeds) {
       await db.add("etapes", {
         voyageId: currentVoyageId || 1,
@@ -823,6 +834,11 @@ async function renderJournal() {
   const etapes = allEtapes.filter((e) => (e.voyageId || 1) === currentVoyageId);
 
   if (etapes.length === 0) {
+    const hasSeeds = list.querySelectorAll("[data-seed]").length > 0;
+    if (hasSeeds && (!currentVoyageId || currentVoyageId === 1)) {
+      emptyMsg.hidden = true;
+      return;
+    }
     emptyMsg.hidden = false;
     list.replaceChildren();
     return;
