@@ -1,0 +1,15 @@
+# Journal de Voyage
+> Carnet de voyage installable et utilisable hors ligne.
+> Enregistrez vos étapes de voyage avec coordonnées GPS et synchronisez au retour du réseau.
+> Projet du cours M2 Informatique, Università di Corsica.
+
+## Contenu
+- [Destinations et conseils de voyage en Markdown](https://journal-voyage.netlify.app/voyage.md)
+
+## Technique
+- Vanilla HTML/CSS/JavaScript
+- Service Worker : App Shell, Cache First, Stale While Revalidate
+- IndexedDB (idb) : stockage local des étapes
+- Background Sync : synchronisation au retour du réseau
+- API Géolocalisation : position GPS des étapes
+- Web App Manifest : installation sur l'écran d'accueil

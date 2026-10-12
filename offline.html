@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hors ligne — Journal de Voyage</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #134e4a 0%, #0d9488 50%, #fbbf24 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+    .offline-container {
+      max-width: 480px;
+    }
+    .offline-icon {
+      font-size: 5rem;
+      margin-bottom: 20px;
+      animation: float 3s ease-in-out infinite;
+    }
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    p {
+      font-size: 1.05rem;
+      opacity: 0.9;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+    .offline-tips {
+      margin-top: 24px;
+      text-align: left;
+      background: rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 18px 20px;
+      font-size: 0.92rem;
+      line-height: 1.7;
+    }
+    .offline-tips li {
+      margin-bottom: 4px;
+      list-style: none;
+    }
+    .offline-tips li::before {
+      content: "✦ ";
+    }
+    .btn-retry {
+      display: inline-block;
+      margin-top: 28px;
+      padding: 12px 28px;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 1.5px solid rgba(255,255,255,0.5);
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-decoration: none;
+    }
+    .btn-retry:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="offline-icon">🧭</div>
+    <h1>Vous êtes hors ligne</h1>
+    <p>Pas de connexion internet pour le moment.</p>
+    <p>Cette page n'a pas encore été mise en cache.</p>
+    <ul class="offline-tips">
+      <li>Vérifiez votre connexion WiFi ou données mobiles</li>
+      <li>Si vous avez déjà visité l'app, retournez à l'accueil</li>
+      <li>Vos étapes sauvegardées seront synchronisées au retour du réseau</li>
+    </ul>
+    <a href="/" class="btn-retry">🔄 Réessayer</a>
+  </div>
+</body>
+</html>

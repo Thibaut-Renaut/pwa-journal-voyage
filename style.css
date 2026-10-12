@@ -1,0 +1,565 @@
+/* ============================================================
+   Journal de Voyage — Style CSS
+   Design responsive, thème voyage (teal + amber)
+   ============================================================ */
+
+/* --- Reset & variables --- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Couleurs principales */
+  --teal-50: #f0fdfa;
+  --teal-100: #ccfbf1;
+  --teal-200: #99f6e4;
+  --teal-400: #2dd4bf;
+  --teal-500: #14b8a6;
+  --teal-600: #0d9488;
+  --teal-700: #0f766e;
+  --teal-800: #115e59;
+  --teal-900: #134e4a;
+
+  --amber-200: #fde68a;
+  --amber-300: #fcd34d;
+  --amber-400: #fbbf24;
+  --amber-500: #f59e0b;
+
+  --slate-50: #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-400: #94a3b8;
+  --slate-500: #64748b;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1e293b;
+  --slate-900: #0f172a;
+
+  --red-400: #f87171;
+  --red-500: #ef4444;
+  --green-400: #4ade80;
+  --green-500: #22c55e;
+
+  /* Tokens de design */
+  --bg-body: var(--slate-50);
+  --bg-card: #ffffff;
+  --text-primary: var(--slate-800);
+  --text-secondary: var(--slate-500);
+  --text-on-primary: #ffffff;
+  --border-color: var(--slate-200);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --transition: 0.2s ease;
+
+  /* Typo */
+  --font-body: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-body);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Bannière de mise à jour --- */
+.update-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, var(--teal-700), var(--teal-600));
+  color: white;
+  font-size: 0.95rem;
+  box-shadow: var(--shadow-lg);
+  animation: slideDown 0.4s ease;
+}
+
+.update-banner[hidden] {
+  display: none;
+}
+
+.update-banner p {
+  flex: 1;
+}
+
+/* --- Indicateur réseau --- */
+.network-status {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 900;
+  padding: 10px 24px;
+  border-radius: 40px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  animation: fadeUp 0.4s ease;
+  transition: opacity var(--transition);
+}
+
+.network-status[hidden] {
+  display: none;
+}
+
+.network-status.offline {
+  background: var(--red-500);
+  color: white;
+}
+
+.network-status.online {
+  background: var(--green-500);
+  color: white;
+}
+
+/* --- Toast --- */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 950;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  background: var(--slate-800);
+  color: white;
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-lg);
+  animation: fadeUp 0.3s ease;
+  max-width: 90vw;
+  text-align: center;
+}
+
+.toast[hidden] {
+  display: none;
+}
+
+/* --- Header --- */
+.header {
+  background: linear-gradient(135deg, var(--teal-800) 0%, var(--teal-600) 60%, var(--amber-400) 100%);
+  color: white;
+  padding: 48px 20px 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
+  border-radius: 50%;
+}
+
+.header__inner {
+  position: relative;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.header__title {
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+
+.header__subtitle {
+  font-size: 1.05rem;
+  opacity: 0.9;
+  margin-bottom: 16px;
+}
+
+/* --- Main --- */
+.main {
+  flex: 1;
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+/* --- Sections --- */
+.section {
+  margin-bottom: 40px;
+}
+
+.section__title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--teal-800);
+  margin-bottom: 8px;
+}
+
+.section__intro {
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.section__empty {
+  color: var(--text-secondary);
+  font-style: italic;
+  text-align: center;
+  padding: 24px;
+}
+
+/* --- Destination cards (contenu public SEO) --- */
+.destinations-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.destination-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: var(--bg-card);
+  padding: 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+
+.destination-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.destination-card__emoji {
+  font-size: 2rem;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--teal-50);
+  border-radius: var(--radius-sm);
+}
+
+.destination-card__content strong {
+  display: block;
+  font-size: 1.05rem;
+  color: var(--teal-700);
+  margin-bottom: 4px;
+}
+
+.destination-card__content p {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* --- Formulaire --- */
+.form {
+  background: var(--bg-card);
+  padding: 24px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.form__group {
+  margin-bottom: 18px;
+}
+
+.form__label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.form__input,
+.form__textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: var(--slate-50);
+  color: var(--text-primary);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.form__input:focus,
+.form__textarea:focus {
+  outline: none;
+  border-color: var(--teal-400);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+}
+
+.form__textarea {
+  resize: vertical;
+}
+
+.form__input--small {
+  width: auto;
+  flex: 1;
+  min-width: 0;
+}
+
+.form__geo-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.form__help {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-top: 6px;
+}
+
+.form__help.error {
+  color: var(--red-500);
+}
+
+.form__help.success {
+  color: var(--green-500);
+}
+
+/* --- Boutons --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn--primary {
+  background: linear-gradient(135deg, var(--teal-600), var(--teal-500));
+  color: var(--text-on-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn--primary:hover {
+  background: linear-gradient(135deg, var(--teal-700), var(--teal-600));
+  box-shadow: var(--shadow-md);
+}
+
+.btn--accent {
+  background: var(--amber-400);
+  color: var(--slate-900);
+}
+
+.btn--accent:hover {
+  background: var(--amber-500);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: white;
+  padding: 6px 10px;
+  font-size: 1.1rem;
+}
+
+.btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.btn--geo {
+  background: var(--amber-400);
+  color: var(--slate-900);
+  font-size: 0.85rem;
+  padding: 8px 14px;
+}
+
+.btn--geo:hover {
+  background: var(--amber-500);
+}
+
+.btn--install {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+.btn--install:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.btn--delete {
+  background: transparent;
+  color: var(--red-400);
+  padding: 4px 8px;
+  font-size: 0.8rem;
+}
+
+.btn--delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--red-500);
+}
+
+/* --- Journal (liste des étapes) --- */
+.journal-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.journal-entry {
+  background: var(--bg-card);
+  padding: 18px 20px;
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--teal-400);
+  box-shadow: var(--shadow-sm);
+  animation: fadeUp 0.3s ease;
+  position: relative;
+}
+
+.journal-entry__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.journal-entry__title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--teal-700);
+}
+
+.journal-entry__date {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.journal-entry__description {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+
+.journal-entry__geo {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: var(--teal-600);
+  background: var(--teal-50);
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.journal-entry__pending {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: var(--amber-500);
+  background: rgba(245, 158, 11, 0.1);
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-left: 6px;
+}
+
+.journal-entry__actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+/* --- Footer --- */
+.footer {
+  text-align: center;
+  padding: 24px 16px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border-color);
+}
+
+/* --- Animations --- */
+@keyframes slideDown {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Responsive --- */
+@media (max-width: 600px) {
+  .header {
+    padding: 36px 16px 28px;
+  }
+
+  .main {
+    padding: 20px 12px;
+  }
+
+  .form {
+    padding: 18px;
+  }
+
+  .form__geo-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form__input--small {
+    width: 100%;
+  }
+
+  .destination-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .journal-entry__header {
+    flex-direction: column;
+  }
+}

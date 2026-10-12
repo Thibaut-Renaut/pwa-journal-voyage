@@ -1,0 +1,14 @@
+# robots.txt — Journal de Voyage PWA
+User-agent: *
+Allow: /
+
+# GPTBot : autorisé — l'app gagne à être citée par les agents IA
+User-agent: GPTBot
+Allow: /
+
+# Google-Extended : interdit — pas d'entraînement de Gemini ; la recherche reste ouverte
+User-agent: Google-Extended
+Disallow: /
+
+Sitemap: https://journal-voyage.netlify.app/sitemap.xml
+# llms.txt : https://journal-voyage.netlify.app/llms.txt
