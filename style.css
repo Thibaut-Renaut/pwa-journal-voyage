@@ -225,7 +225,7 @@ body {
 .header__inner {
   position: relative;
   z-index: 1;
-  max-width: 680px;
+  max-width: 780px;
   margin: 0 auto;
 }
 
@@ -393,7 +393,7 @@ body {
    ============================================================ */
 .main {
   flex: 1;
-  max-width: 720px;
+  max-width: 860px;
   width: 100%;
   margin: 0 auto;
   padding: 36px 20px 60px;
@@ -818,12 +818,21 @@ body {
   list-style: none;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 16px;
+  gap: 20px;
 }
 
-@media (min-width: 601px) {
-  .destinations-list {
+@media (min-width: 640px) {
+  #destinations-list {
     grid-template-columns: repeat(3, 1fr);
+  }
+  #voyages-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1040px) {
+  #voyages-list {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
 }
 
@@ -972,10 +981,63 @@ body {
 .voyage-card__actions {
   display: flex;
   gap: 8px;
+  align-items: center;
 }
 
-.voyage-card__actions .btn {
-  flex: 1;
+.voyage-card__btn-open {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 8px 10px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  justify-content: center;
+}
+
+.voyage-card__btn-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 10px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.voyage-card__btn-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  flex: 0 0 34px;
+  border-radius: var(--radius-sm);
+  color: var(--gray-400);
+  border: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.voyage-card__btn-delete:hover {
+  color: #dc2626;
+  border-color: #fca5a5;
+  background: #fef2f2;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 350px) {
+  .voyage-card__actions {
+    flex-wrap: wrap;
+  }
+  .voyage-card__btn-open {
+    width: 100%;
+    flex: 1 0 100%;
+  }
 }
 
 .edit-photo-actions {
@@ -1100,6 +1162,46 @@ body {
 
 .modal-card__actions .btn {
   flex: 1;
+}
+
+.modal-card__actions--space-between {
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.modal-card__actions--space-between > .btn {
+  flex: 0 0 auto;
+}
+
+.modal-card__actions-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.modal-card__badge--danger {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.btn--danger {
+  background: #dc2626;
+  color: var(--white);
+  border: 1px solid #b91c1c;
+  padding: 10px 18px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25);
+}
+
+.btn--danger:hover {
+  background: #b91c1c;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
 }
 
 /* Liste de sélection de voyages */

@@ -51,7 +51,7 @@
   </script>
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/style.css?v=5">
+  <link rel="stylesheet" href="/style.css?v=6">
 
   <!-- idb via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/idb@8/build/umd.js"></script>
@@ -362,11 +362,38 @@
             <button type="button" id="btn-remove-edit-cover" class="btn btn--delete btn--sm">Supprimer la photo de couverture</button>
           </div>
         </div>
-        <div class="modal-card__actions">
-          <button type="button" id="btn-cancel-edit-voyage" class="btn btn--outline">Annuler</button>
-          <button type="submit" class="btn btn--primary">Enregistrer les modifications →</button>
+        <div class="modal-card__actions modal-card__actions--space-between">
+          <button type="button" id="btn-delete-from-edit" class="btn btn--delete btn--sm">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            Supprimer ce carnet
+          </button>
+          <div class="modal-card__actions-group">
+            <button type="button" id="btn-cancel-edit-voyage" class="btn btn--outline">Annuler</button>
+            <button type="submit" class="btn btn--primary">Enregistrer les modifications →</button>
+          </div>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- ===== Modale : Confirmation suppression de carnet ===== -->
+  <div id="modal-delete-voyage" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="modal-delete-voyage-title">
+    <div class="modal-overlay__backdrop" id="modal-delete-voyage-backdrop"></div>
+    <div class="modal-card">
+      <button type="button" id="btn-close-delete-voyage" class="modal-card__close" aria-label="Fermer">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+      <div class="modal-card__header">
+        <span class="modal-card__badge modal-card__badge--danger">Suppression</span>
+        <h3 id="modal-delete-voyage-title" class="modal-card__title">Supprimer ce carnet ?</h3>
+        <p class="modal-card__subtitle" id="modal-delete-voyage-desc">
+          Cette action est irréversible. Toutes les étapes et photos associées seront définitivement supprimées.
+        </p>
+      </div>
+      <div class="modal-card__actions">
+        <button type="button" id="btn-cancel-delete-voyage" class="btn btn--outline">Annuler</button>
+        <button type="button" id="btn-confirm-delete-voyage" class="btn btn--danger">Supprimer définitivement</button>
+      </div>
     </div>
   </div>
 
@@ -433,6 +460,6 @@
   </footer>
 
   <!-- Application logic -->
-  <script src="/app.js?v=5"></script>
+  <script src="/app.js?v=6"></script>
 </body>
 </html>

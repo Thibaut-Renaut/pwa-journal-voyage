@@ -13,7 +13,8 @@ const ICONS = {
   check: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
   clock: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
   pin: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`,
-  trash: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`,
+  trash: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`,
+  edit: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`,
   close: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
   book: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>`,
 };
@@ -283,7 +284,7 @@ async function renderVoyages() {
 
     const btnOpen = document.createElement("button");
     btnOpen.type = "button";
-    btnOpen.className = `btn ${isActive ? "btn--secondary" : "btn--primary"} btn--sm`;
+    btnOpen.className = `btn ${isActive ? "btn--secondary" : "btn--primary"} btn--sm voyage-card__btn-open`;
     btnOpen.textContent = isActive ? "Carnet ouvert" : "Ouvrir ce carnet";
     btnOpen.disabled = isActive;
     btnOpen.addEventListener("click", () => setActiveVoyage(voyage.id));
@@ -291,10 +292,20 @@ async function renderVoyages() {
 
     const btnEdit = document.createElement("button");
     btnEdit.type = "button";
-    btnEdit.className = "btn btn--outline btn--sm";
-    btnEdit.textContent = "Modifier";
+    btnEdit.className = "btn btn--outline btn--sm voyage-card__btn-edit";
+    btnEdit.innerHTML = `${ICONS.edit} <span>Modifier</span>`;
+    btnEdit.title = "Modifier ce carnet";
     btnEdit.addEventListener("click", () => openEditVoyageModal(voyage.id));
     actions.appendChild(btnEdit);
+
+    const btnDelete = document.createElement("button");
+    btnDelete.type = "button";
+    btnDelete.className = "voyage-card__btn-delete";
+    btnDelete.innerHTML = ICONS.trash;
+    btnDelete.title = "Supprimer ce carnet";
+    btnDelete.setAttribute("aria-label", "Supprimer ce carnet");
+    btnDelete.addEventListener("click", () => promptDeleteVoyage(voyage.id, voyage.titre));
+    actions.appendChild(btnDelete);
 
     footer.appendChild(actions);
     li.appendChild(footer);
@@ -545,6 +556,93 @@ document.getElementById("form-edit-voyage")?.addEventListener("submit", async (e
 
   showToast(`Carnet « ${titre} » mis à jour !`);
 });
+
+// ============================================================
+// SUPPRESSION D'UN CARNET DE VOYAGE
+// ============================================================
+let pendingDeleteVoyageId = null;
+const modalDeleteVoyage = document.getElementById("modal-delete-voyage");
+const modalDeleteVoyageDesc = document.getElementById("modal-delete-voyage-desc");
+
+async function promptDeleteVoyage(voyageId, voyageTitre) {
+  const db = await dbPromise;
+  const voyages = await db.getAll("voyages");
+  if (voyages.length <= 1) {
+    showToast("Impossible de supprimer le seul carnet existant.");
+    return;
+  }
+
+  pendingDeleteVoyageId = voyageId;
+  if (modalDeleteVoyageDesc) {
+    modalDeleteVoyageDesc.innerHTML = `Êtes-vous sûr de vouloir supprimer le carnet <strong>« ${voyageTitre} »</strong> ? Toutes les étapes et photos associées seront définitivement supprimées.`;
+  }
+  showModal(modalDeleteVoyage);
+}
+
+document.getElementById("btn-close-delete-voyage")?.addEventListener("click", () => hideModal(modalDeleteVoyage));
+document.getElementById("btn-cancel-delete-voyage")?.addEventListener("click", () => hideModal(modalDeleteVoyage));
+document.getElementById("modal-delete-voyage-backdrop")?.addEventListener("click", () => hideModal(modalDeleteVoyage));
+
+// Bouton supprimer depuis la modale d'édition
+document.getElementById("btn-delete-from-edit")?.addEventListener("click", () => {
+  if (!editingVoyageId) return;
+  const titre = document.getElementById("edit-voyage-titre").value.trim() || "ce carnet";
+  const idToDelete = editingVoyageId;
+  hideModal(modalEditVoyage);
+  promptDeleteVoyage(idToDelete, titre);
+});
+
+// Confirmation définitive de la suppression
+document.getElementById("btn-confirm-delete-voyage")?.addEventListener("click", async () => {
+  if (!pendingDeleteVoyageId) return;
+  const id = pendingDeleteVoyageId;
+  hideModal(modalDeleteVoyage);
+  await deleteVoyage(id);
+  pendingDeleteVoyageId = null;
+});
+
+async function deleteVoyage(voyageId) {
+  const db = await dbPromise;
+  const voyages = await db.getAll("voyages");
+
+  if (voyages.length <= 1) {
+    showToast("Impossible de supprimer le seul carnet existant.");
+    return;
+  }
+
+  const targetVoyage = voyages.find((v) => v.id === voyageId);
+  const titre = targetVoyage ? targetVoyage.titre : "Carnet";
+
+  // 1. Supprimer toutes les étapes rattachées à ce voyage
+  const allEtapes = await db.getAll("etapes");
+  const etapesToDelete = allEtapes.filter((e) => e.voyageId === voyageId);
+  for (const etape of etapesToDelete) {
+    await db.delete("etapes", etape.id);
+  }
+
+  // 2. Supprimer les éléments d'outbox rattachés
+  const outboxItems = await db.getAll("outbox");
+  for (const item of outboxItems) {
+    if (item.data && item.data.voyageId === voyageId) {
+      await db.delete("outbox", item.id);
+    }
+  }
+
+  // 3. Supprimer le carnet lui-même
+  await db.delete("voyages", voyageId);
+
+  // 4. Si c'était le carnet actif, basculer sur un carnet restant
+  if (currentVoyageId === voyageId) {
+    const remaining = (await db.getAll("voyages")).filter((v) => v.id !== voyageId);
+    if (remaining.length > 0) {
+      await setActiveVoyage(remaining[0].id);
+    }
+  } else {
+    await renderVoyages();
+  }
+
+  showToast(`Carnet « ${titre} » supprimé.`);
+}
 
 // ============================================================
 // 5. GESTION DES PHOTOS DE L'ÉTAPE
