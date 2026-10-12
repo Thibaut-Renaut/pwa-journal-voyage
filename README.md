@@ -3,8 +3,9 @@
 Application web progressive (PWA) de carnet de voyage installable, utilisable 100 % hors ligne avec synchronisation automatique, géolocalisation et capture photo.
 
 > **Projet de Master 2 Informatique — Università di Corsica (2026)**  
-> **Dépôt officiel :** [https://github.com/Thibaut-Renaut/pwa-journal-voyage](https://github.com/Thibaut-Renaut/pwa-journal-voyage)  
-> **Documentation technique :** [DOC-TECHNIQUE.md](file:///c:/Master/M2/Progressive%20web%20apps/TPNOTE/DOC-TECHNIQUE.md)  
+> **Application en ligne :** [https://journalvoyage.netlify.app/](https://journalvoyage.netlify.app/)  
+> **Dépôt GitHub :** [https://github.com/Thibaut-Renaut/pwa-journal-voyage](https://github.com/Thibaut-Renaut/pwa-journal-voyage)  
+> **Documentation technique :** [DOC-TECHNIQUE.md](./DOC-TECHNIQUE.md)  
 
 ---
 

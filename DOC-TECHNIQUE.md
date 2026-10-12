@@ -2,6 +2,7 @@
 
 **Projet :** Journal de Voyage — Application PWA complète et autonome  
 **Cadre :** TP Noté PWA · Master 2 Informatique · Università di Corsica  
+**Application en ligne :** [https://journalvoyage.netlify.app/](https://journalvoyage.netlify.app/)  
 **Dépôt GitHub :** [https://github.com/Thibaut-Renaut/pwa-journal-voyage](https://github.com/Thibaut-Renaut/pwa-journal-voyage)  
 **Date :** Octobre 2026  
 
@@ -43,7 +44,7 @@
 Le Service Worker (`sw.js`) agit comme un proxy programmable interceptant toutes les requêtes réseau pour assurer résilience et rapidité.
 
 ### 3.1. Pré-mise en cache de l'App Shell (`install`)
-À l'installation, le Service Worker télécharge et stocke immédiatement les fichiers indispensables dans le cache nommé `pwa-voyage-v6` :
+À l'installation, le Service Worker télécharge et stocke immédiatement les fichiers indispensables dans le cache nommé `pwa-voyage-v7` :
 - `/` et `/index.html` (Structure principale)
 - `/app.js` (Logique applicative)
 - `/style.css` (Feuille de style complète)
@@ -57,7 +58,7 @@ Trois stratégies distinctes sont déployées selon la nature de la ressource :
 
 1. **Navigation HTML : Stale While Revalidate (SWR) avec Fallback**
    - *Fonctionnement* : Le Service Worker sert instantanément le fichier HTML depuis le cache local (affichage immédiat), tout en lançant une requête réseau en tâche de fond pour actualiser le cache.
-   - *Prise en charge de `ignoreSearch: true`* : Permet de répondre avec la page d'accueil en cache même si l'URL contient des paramètres de requête (ex. `/?v=6` ou jetons de navigation).
+   - *Prise en charge de `ignoreSearch: true`* : Permet de répondre avec la page d'accueil en cache même si l'URL contient des paramètres de requête (ex. `/?v=7` ou jetons de navigation).
    - *Fallback d'urgence* : Si la requête réseau échoue et qu'aucune page correspondante n'est en cache, le Service Worker sert la page de secours stylisée `/offline.html`.
 
 2. **Assets Statiques : Cache First**
@@ -116,19 +117,20 @@ Les données de l'application sont stockées **strictement en local** sur le ter
 - Les événements natifs `window.addEventListener("online")` et `"offline"` pilotent un badge visuel flottant `.network-status`.
 - Lors d'une bascule hors ligne, un toast informe immédiatement l'utilisateur que l'application reste opérationnelle et que les futures actions seront différées.
 
-### 5.2. Protocole de synchronisation (Background Sync + Repli)
+### 5.2. Protocole de synchronisation (Optimistic UI + Background Sync + Repli)
 Lorsqu'un utilisateur ajoute une nouvelle étape :
-1. L'étape est enregistrée localement dans IndexedDB avec `synced: false`.
-2. L'application tente un envoi immédiat vers le point de terminaison distant (`https://httpbin.org/post`).
-3. **Cas hors ligne ou échec réseau** :
-   - La charge utile est déposée dans le store `outbox` d'IndexedDB.
-   - **Background Sync API (Chromium)** : L'application enregistre une tâche différée via `registration.sync.register("sync-pending")`. Le Service Worker exécutera l'envoi même si l'onglet est fermé au moment du retour du réseau.
-   - **Repli universel obligatoire (Firefox / Safari)** : Ces navigateurs ne supportant pas l'API Background Sync, l'écouteur `window.addEventListener("online")` appelle directement la fonction `syncPendingData()` dès que la connexion est rétablie.
-4. Au succès de l'envoi, l'élément est purgé de l'outbox, le drapeau `synced` passe à `true` dans IndexedDB et le badge de l'étape se transforme en "Synchronisé".
+1. **Mise à jour optimiste immédiate (Optimistic UI)** : L'étape est enregistrée localement dans IndexedDB et affichée **instantanément dans l'itinéraire** sans aucun blocage d'interface ni besoin de rafraîchir la page.
+2. **Payload réseau allégé** : L'application prépare un payload de synchronisation épuré des volumineux flux Base64 (`photosCount` transmis à la place des méga-octets de blobs bruts).
+3. **Cas en ligne** : Requête POST rapide avec temporisateur `AbortSignal.timeout(3500)`. Dès l'acquittement 200 OK du serveur, l'étape passe immédiatement à l'état `synced: true` et le badge devient vert « Synchronisé ».
+4. **Cas hors ligne ou échec réseau** :
+   - La charge utile légère est déposée dans le store `outbox` d'IndexedDB.
+   - **Background Sync API (Chromium)** : L'application enregistre une tâche différée via `registration.sync.register("sync-etapes")`. Le Service Worker exécutera l'envoi dès le retour du réseau, même si l'onglet est fermé.
+   - **Repli universel obligatoire (Firefox / Safari)** : Écouteur `window.addEventListener("online")` qui appelle directement `syncOutbox()` dès que la connexion est rétablie.
+5. Au succès de la synchronisation, l'élément est purgé de l'outbox et le badge de l'étape se transforme en "Synchronisé".
 
 ---
 
-## 6. Capacités de l'Appareil Exploitees (Device APIs)
+## 6. Capacités de l'Appareil Exploitées (Device APIs)
 
 Conformément aux exigences et aux critères bonus du TP, l'application mobilise **deux capacités matérielles distinctes**, en respectant le principe d'une demande de permission consécutive à un geste explicite de l'utilisateur :
 
@@ -137,8 +139,10 @@ Conformément aux exigences et aux critères bonus du TP, l'application mobilise
 - **Paramètres** : `enableHighAccuracy: true` et `timeout: 10000` pour une précision GPS optimale sur le terrain.
 - **Gestion des erreurs et refus** : En cas de refus de permission (`PERMISSION_DENIED`) ou d'impossibilité de fixer les satellites (`POSITION_UNAVAILABLE`), l'application affiche un toast d'explication convivial sans aucun crash, et permet la saisie manuelle des coordonnées.
 
-### 6.2. Capacité 2 (Bonus) : Caméra et Prise de Vue (`<input type="file" accept="image/*">` + Canvas)
-- **Déclenchement** : Clic sur *"Ajouter une ou plusieurs photos"*.
+### 6.2. Capacité 2 (Bonus) : Caméra et Prise de Vue (`capture="environment"` + Canvas)
+- **Déclenchement & Ergonomie mobile** : Deux options distinctes sont proposées dans le formulaire :
+  1. *« Prendre une photo »* : Équipé de l'attribut W3C standard `capture="environment"`, ouvrant directement le capteur photo du smartphone pour une capture en temps réel.
+  2. *« Choisir dans la galerie »* : Sélection de photos multiples depuis la bibliothèque ou l'explorateur de fichiers.
 - **Optimisation embarquée** : Les photos prises sur les smartphones modernes peuvent peser entre 5 et 15 Mo. Afin d'éviter la saturation de l'IndexedDB et des transferts réseau, une fonction `readFileAsOptimizedDataUrl()` utilise un `HTMLCanvasElement` pour redimensionner automatiquement les images à une dimension maximale de 1280px tout en compressant le flux JPEG (qualité 0.82).
 
 ---
