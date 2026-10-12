@@ -66,28 +66,70 @@ async function initServiceWorker() {
 }
 
 // ============================================================
-// 2. BOUTON D'INSTALLATION CUSTOM (beforeinstallprompt)
+// 2. MODALE D'INSTALLATION CUSTOM (beforeinstallprompt)
 // ============================================================
 let deferredPrompt = null;
+const installModal = document.getElementById("install-modal");
+const btnInstallConfirm = document.getElementById("btn-install-confirm");
+const btnInstallDismiss = document.getElementById("btn-install-dismiss");
+const btnInstallClose = document.getElementById("btn-install-close");
+const installBackdrop = document.getElementById("install-modal-backdrop");
+
+function openInstallModal() {
+  if (!installModal) return;
+  if (sessionStorage.getItem("pwa-install-dismissed")) return;
+  installModal.hidden = false;
+  requestAnimationFrame(() => {
+    installModal.classList.add("is-visible");
+  });
+}
+
+function closeInstallModal(rememberDismiss = false) {
+  if (!installModal) return;
+  installModal.classList.remove("is-visible");
+  setTimeout(() => {
+    installModal.hidden = true;
+  }, 300);
+  if (rememberDismiss) {
+    sessionStorage.setItem("pwa-install-dismissed", "true");
+  }
+}
 
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  document.getElementById("btn-install").hidden = false;
+  // Afficher la modale popup après un court délai pour un rendu soigné
+  setTimeout(() => {
+    openInstallModal();
+  }, 1000);
 });
 
-document.getElementById("btn-install").addEventListener("click", async () => {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  console.log(outcome === "accepted" ? "✅ App installée" : "❌ Installation refusée");
-  deferredPrompt = null;
-  document.getElementById("btn-install").hidden = true;
-});
+if (btnInstallConfirm) {
+  btnInstallConfirm.addEventListener("click", async () => {
+    if (!deferredPrompt) return;
+    closeInstallModal(false);
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(outcome === "accepted" ? "✅ App installée" : "❌ Installation refusée");
+    deferredPrompt = null;
+  });
+}
+
+if (btnInstallDismiss) {
+  btnInstallDismiss.addEventListener("click", () => closeInstallModal(true));
+}
+
+if (btnInstallClose) {
+  btnInstallClose.addEventListener("click", () => closeInstallModal(true));
+}
+
+if (installBackdrop) {
+  installBackdrop.addEventListener("click", () => closeInstallModal(true));
+}
 
 window.addEventListener("appinstalled", () => {
-  document.getElementById("btn-install").hidden = true;
-  showToast("✅ L'application a été installée !");
+  closeInstallModal(true);
+  showToast("✅ L'application a été installée avec succès !");
 });
 
 // ============================================================
