@@ -51,7 +51,7 @@
   </script>
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/style.css?v=8">
+  <link rel="stylesheet" href="/style.css?v=9">
 
   <!-- idb via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/idb@8/build/umd.js"></script>
@@ -216,8 +216,57 @@
           </h2>
         </div>
       </div>
-      <p id="journal-empty" class="section__empty">Aucune étape enregistrée pour ce carnet.<br>Ajoutez votre première aventure ci-dessus !</p>
-      <ul id="journal-list" class="journal-list"></ul>
+      <p id="journal-empty" class="section__empty" hidden>Aucune étape enregistrée pour ce carnet.<br>Ajoutez votre première aventure ci-dessus !</p>
+      <ul id="journal-list" class="journal-list">
+        <li data-seed class="journal-entry">
+          <div class="journal-entry__dot">1</div>
+          <div class="journal-entry__card">
+            <div class="journal-entry__header">
+              <h3 class="journal-entry__title">Aiguilles de Bavella</h3>
+              <time class="journal-entry__time">Étape 1</time>
+            </div>
+            <p class="journal-entry__desc">Randonnée spectaculaire à travers les aiguilles de granite rouge. Un panorama à couper le souffle sur les montagnes corses et la mer Tyrrhénienne.</p>
+            <div class="journal-entry__footer">
+              <span class="journal-entry__status is-synced">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Synchronisé
+              </span>
+            </div>
+          </div>
+        </li>
+        <li data-seed class="journal-entry">
+          <div class="journal-entry__dot">2</div>
+          <div class="journal-entry__card">
+            <div class="journal-entry__header">
+              <h3 class="journal-entry__title">Calanques de Piana</h3>
+              <time class="journal-entry__time">Étape 2</time>
+            </div>
+            <p class="journal-entry__desc">Classées au patrimoine mondial de l'UNESCO, ces formations rocheuses de granit rose plongent dans une mer turquoise. Un spectacle naturel unique en Méditerranée.</p>
+            <div class="journal-entry__footer">
+              <span class="journal-entry__status is-synced">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Synchronisé
+              </span>
+            </div>
+          </div>
+        </li>
+        <li data-seed class="journal-entry">
+          <div class="journal-entry__dot">3</div>
+          <div class="journal-entry__card">
+            <div class="journal-entry__header">
+              <h3 class="journal-entry__title">Plage de Palombaggia</h3>
+              <time class="journal-entry__time">Étape 3</time>
+            </div>
+            <p class="journal-entry__desc">Sable fin, eaux cristallines et pins parasols : l'une des plus belles plages de France. Idéale pour une journée de détente entre deux randonnées.</p>
+            <div class="journal-entry__footer">
+              <span class="journal-entry__status is-synced">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Synchronisé
+              </span>
+            </div>
+          </div>
+        </li>
+      </ul>
     </section>
 
     <!-- Section Mes carnets de voyage précédents (au-dessus des destinations) -->
@@ -239,7 +288,25 @@
         </button>
       </div>
       <ul id="voyages-list" class="destinations-list voyages-list">
-        <!-- Rendu dynamique par JavaScript -->
+        <li data-seed-voyage class="destination-card voyage-card voyage-card--active">
+          <div class="destination-card__media">
+            <span class="voyage-card__active-badge">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              Carnet actif
+            </span>
+            <img src="/images/bavella.jpg" alt="Photo de couverture pour Échappée en Corse" class="destination-card__img" loading="lazy" />
+          </div>
+          <div class="destination-card__body">
+            <div class="voyage-card__header">
+              <h3 class="destination-card__name">Échappée en Corse</h3>
+              <span class="voyage-card__badge">3 étapes</span>
+            </div>
+            <p class="destination-card__description">Aventures et randonnées au cœur des paysages corses, entre mer et montagnes.</p>
+            <div class="voyage-card__actions">
+              <button type="button" class="btn btn--outline btn--sm btn--active-status" disabled>Carnet ouvert</button>
+            </div>
+          </div>
+        </li>
       </ul>
     </section>
 
@@ -477,6 +544,6 @@
   </footer>
 
   <!-- Application logic -->
-  <script src="/app.js?v=8"></script>
+  <script src="/app.js?v=9"></script>
 </body>
 </html>
