@@ -19,26 +19,45 @@ const ICONS = {
   book: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>`,
 };
 
+// --- Helpers de stockage sécurisés (évite les SecurityError sous sandbox / Googlebot) ---
+function getStorage(key) {
+  try { return localStorage.getItem(key); } catch { return null; }
+}
+function setStorage(key, val) {
+  try { localStorage.setItem(key, String(val)); } catch {}
+}
+function getSession(key) {
+  try { return sessionStorage.getItem(key); } catch { return null; }
+}
+function setSession(key, val) {
+  try { sessionStorage.setItem(key, String(val)); } catch {}
+}
+
 // ============================================================
 // OUVERTURE / MIGRATION DE LA BASE IndexedDB (Version 2)
 // ============================================================
-const dbPromise = idb.openDB("journal-voyage-db", 2, {
-  upgrade(db, oldVersion) {
-    // 1. Store des étapes
-    if (!db.objectStoreNames.contains("etapes")) {
-      const etapesStore = db.createObjectStore("etapes", { keyPath: "id", autoIncrement: true });
-      etapesStore.createIndex("by-voyage", "voyageId");
-    }
-    // 2. Store outbox pour la synchronisation hors ligne
-    if (!db.objectStoreNames.contains("outbox")) {
-      db.createObjectStore("outbox", { keyPath: "id", autoIncrement: true });
-    }
-    // 3. Store des voyages (nouveau en v2)
-    if (!db.objectStoreNames.contains("voyages")) {
-      db.createObjectStore("voyages", { keyPath: "id", autoIncrement: true });
-    }
-  },
-});
+const dbPromise = (typeof idb !== "undefined" && typeof indexedDB !== "undefined")
+  ? idb.openDB("journal-voyage-db", 2, {
+      upgrade(db, oldVersion) {
+        // 1. Store des étapes
+        if (!db.objectStoreNames.contains("etapes")) {
+          const etapesStore = db.createObjectStore("etapes", { keyPath: "id", autoIncrement: true });
+          etapesStore.createIndex("by-voyage", "voyageId");
+        }
+        // 2. Store outbox pour la synchronisation hors ligne
+        if (!db.objectStoreNames.contains("outbox")) {
+          db.createObjectStore("outbox", { keyPath: "id", autoIncrement: true });
+        }
+        // 3. Store des voyages (nouveau en v2)
+        if (!db.objectStoreNames.contains("voyages")) {
+          db.createObjectStore("voyages", { keyPath: "id", autoIncrement: true });
+        }
+      },
+    }).catch((err) => {
+      console.warn("[IndexedDB] Accès restreint ou indisponible :", err);
+      return null;
+    })
+  : Promise.resolve(null);
 
 // État global du voyage actif
 let currentVoyageId = null;
@@ -102,7 +121,7 @@ const installBackdrop = document.getElementById("install-modal-backdrop");
 
 function openInstallModal() {
   if (!installModal) return;
-  if (sessionStorage.getItem("pwa-install-dismissed")) return;
+  if (getSession("pwa-install-dismissed")) return;
   installModal.hidden = false;
   requestAnimationFrame(() => installModal.classList.add("is-visible"));
 }
@@ -112,7 +131,7 @@ function closeInstallModal(rememberDismiss = false) {
   installModal.classList.remove("is-visible");
   setTimeout(() => { installModal.hidden = true; }, 300);
   if (rememberDismiss) {
-    sessionStorage.setItem("pwa-install-dismissed", "true");
+    setSession("pwa-install-dismissed", "true");
   }
 }
 
@@ -149,6 +168,7 @@ window.addEventListener("appinstalled", () => {
 /** Initialise ou récupère les voyages existants */
 async function initVoyages() {
   const db = await dbPromise;
+  if (!db) return;
   let voyages = await db.getAll("voyages");
 
   // Si aucun voyage n'existe, créer le voyage par défaut
@@ -174,10 +194,10 @@ async function initVoyages() {
   }
 
   // Déterminer le voyage actif (sauvegardé dans localStorage ou premier disponible)
-  const savedVoyageId = parseInt(localStorage.getItem("pwa-active-voyage-id"), 10);
+  const savedVoyageId = parseInt(getStorage("pwa-active-voyage-id"), 10);
   const found = voyages.find((v) => v.id === savedVoyageId);
   currentVoyageId = found ? found.id : voyages[0].id;
-  localStorage.setItem("pwa-active-voyage-id", currentVoyageId);
+  setStorage("pwa-active-voyage-id", currentVoyageId);
 
   await updateActiveVoyageUI();
   await renderVoyages();
@@ -186,6 +206,7 @@ async function initVoyages() {
 /** Met à jour les éléments d'interface liés au voyage actif */
 async function updateActiveVoyageUI() {
   const db = await dbPromise;
+  if (!db) return;
   const voyage = await db.get("voyages", currentVoyageId);
   if (!voyage) return;
 
@@ -198,7 +219,7 @@ async function updateActiveVoyageUI() {
 /** Change le voyage actif */
 async function setActiveVoyage(voyageId) {
   currentVoyageId = voyageId;
-  localStorage.setItem("pwa-active-voyage-id", currentVoyageId);
+  setStorage("pwa-active-voyage-id", currentVoyageId);
   await updateActiveVoyageUI();
   await renderJournal();
   await renderVoyages();
@@ -208,6 +229,7 @@ async function setActiveVoyage(voyageId) {
 /** Rendu de la section « Mes carnets de voyage » */
 async function renderVoyages() {
   const db = await dbPromise;
+  if (!db) return;
   const voyages = await db.getAll("voyages");
   const list = document.getElementById("voyages-list");
   if (!list) return;
@@ -765,6 +787,7 @@ async function hydrateDestinations() {
   });
 
   const db = await dbPromise;
+  if (!db) return;
 
   // Premier lancement uniquement : importer les exemples dans le voyage actif
   if ((await db.count("etapes")) === 0) {
@@ -790,6 +813,7 @@ async function hydrateDestinations() {
 // ============================================================
 async function renderJournal() {
   const db = await dbPromise;
+  if (!db) return;
   const allEtapes = await db.getAll("etapes");
   const list = document.getElementById("journal-list");
   const emptyMsg = document.getElementById("journal-empty");
@@ -1168,9 +1192,23 @@ function showNetworkStatus(typeClass, text) {
 // 13. INITIALISATION AU DÉMARRAGE
 // ============================================================
 (async function init() {
-  await initServiceWorker();
-  await initVoyages();
-  await hydrateDestinations();
+  try {
+    await initServiceWorker();
+  } catch (err) {
+    console.warn("[SW] Erreur initialisation :", err);
+  }
+
+  try {
+    await initVoyages();
+  } catch (err) {
+    console.warn("[Voyages] Erreur initialisation :", err);
+  }
+
+  try {
+    await hydrateDestinations();
+  } catch (err) {
+    console.warn("[Hydratation] Erreur initialisation :", err);
+  }
 
   if (!navigator.onLine) {
     showNetworkStatus("is-offline", "Vous êtes hors ligne");

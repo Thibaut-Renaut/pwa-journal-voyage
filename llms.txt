@@ -4,7 +4,7 @@
 > Projet du cours M2 Informatique, Università di Corsica.
 
 ## Contenu
-- [Destinations et conseils de voyage en Markdown](https://journal-voyage.netlify.app/voyage.md)
+- [Destinations et conseils de voyage en Markdown](https://journalvoyage.netlify.app/voyage.md)
 
 ## Technique
 - Vanilla HTML/CSS/JavaScript

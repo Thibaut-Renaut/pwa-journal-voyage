@@ -6,9 +6,29 @@ Allow: /
 User-agent: GPTBot
 Allow: /
 
-# Google-Extended : interdit — pas d'entraînement de Gemini ; la recherche reste ouverte
+# OAI-SearchBot : autorisé — indexation et citation pour les recherches ChatGPT
+User-agent: OAI-SearchBot
+Allow: /
+
+# ClaudeBot : interdit — pas d'aspiration pour entraînement sans citation directe
+User-agent: ClaudeBot
+Disallow: /
+
+# Claude-SearchBot : autorisé — citation de nos carnets de voyage par Claude
+User-agent: Claude-SearchBot
+Allow: /
+
+# PerplexityBot : autorisé — moteur de recherche conversationnel et citation
+User-agent: PerplexityBot
+Allow: /
+
+# CCBot : interdit — robot d'aspiration massif sans apport direct de trafic
+User-agent: CCBot
+Disallow: /
+
+# Google-Extended : interdit — pas d'entraînement de Gemini ; la recherche Google standard reste ouverte
 User-agent: Google-Extended
 Disallow: /
 
-Sitemap: https://journal-voyage.netlify.app/sitemap.xml
-# llms.txt : https://journal-voyage.netlify.app/llms.txt
+Sitemap: https://journalvoyage.netlify.app/sitemap.xml
+# llms.txt : https://journalvoyage.netlify.app/llms.txt
