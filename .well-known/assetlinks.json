@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.netlify.journalvoyage.twa",
+      "sha256_cert_fingerprints": ["BC:DB:CC:C6:E4:8B:12:0D:ED:C1:64:BF:C9:85:1F:D0:A9:89:C6:29:42:8A:C4:A7:9C:7E:C9:89:95:03:04:0E"]
+    }
+  }
+]
